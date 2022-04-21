@@ -4,8 +4,8 @@
     "productId": "0x0002",
     "lighting": "none",
     "matrix": {
-        "rows": 12,
-        "cols": 4
+        "rows": 4,
+        "cols": 12
     },
     "layouts": {
         "labels":[
