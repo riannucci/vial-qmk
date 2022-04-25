@@ -126,7 +126,7 @@ static void raw_hid_task(void) {
 
 static void midi_ep_task(void) {}
 
-void protocol_setup(void) { tusb_init(); }
+void protocol_setup(void) { EEPROM_Init(); tusb_init(); }
 
 void protocol_pre_init(void) {
     // if (watchdog_caused_reboot() && watchdog_hw->scratch[0] == 0x2040dead) {
@@ -135,7 +135,6 @@ void protocol_pre_init(void) {
     watchdog_enable(8000, 1);
     watchdog_hw->scratch[0] = 0x2040dead;
     pico_cdc_enable_printf();
-    EEPROM_Init();
 }
 
 void protocol_post_init(void) { host_set_driver(&driver); }
@@ -265,12 +264,14 @@ uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t
 static uint8_t keyboard_indicator_led;
 uint8_t        get_keyboard_led_status(void) { return keyboard_indicator_led; }
 
-__attribute__((weak)) void raw_hid_receive(uint8_t* data, uint8_t length) {}
-
 // Invoked when received SET_REPORT control request or
 // received data on OUT endpoint ( Report ID = 0, Type = 0 )
 void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) {
     switch (itf) {
+        case ITF_NUM_HID_KEYBOARD:
+            // LED status
+            keyboard_indicator_led = buffer[0];
+            break;
         case ITF_NUM_HID_RAW:
             raw_hid_receive((uint8_t*)buffer, bufsize);
             break;
