@@ -26,5 +26,5 @@ void platform_setup(void) {
         setPinInputHigh(i);
     }
 
-    // adc_init();
+    adc_init();
 }
