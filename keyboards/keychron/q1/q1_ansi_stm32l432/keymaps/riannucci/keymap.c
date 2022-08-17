@@ -142,26 +142,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;  // Skip all further processing of this key
-        case FC_1:
-        case FC_2:
-        case FC_3:
-        case FC_4:
-        case FC_5:
-        case FC_6:
-        case FC_7:
-        case FC_8:
-        case FC_9:
-        case FC_0:
-        case FC_SCLN:
+        case FC_1 ... FC_SCLN:
             real_code = KC_1 + (keycode - FC_1);
             if (record->event.pressed) {
               if (mod_state & MOD_MASK_SHIFT) {
                 del_mods(MOD_MASK_SHIFT);
+                register_code(real_code);
+                set_mods(mod_state);
+              } else if (is_caps_word_on()) {
+                // behave like shifted, e.g. send normal code.
+                register_code(real_code);
               } else {
-                add_mods(MOD_LSFT);
+                add_oneshot_mods(MOD_LSFT);
+                register_code(real_code);
               }
-              register_code(real_code);
-              set_mods(mod_state);
             } else {
               unregister_code(real_code);
             }
