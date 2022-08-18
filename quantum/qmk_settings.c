@@ -161,7 +161,31 @@ void qmk_settings_init(void) {
 
 void qmk_settings_reset(void) {
     QS.grave_esc_override = 0;
-    QS.auto_shift = 0;
+    QS.auto_shift = (
+      0
+#ifdef AUTO_SHIFT_ENABLE
+      | 1
+#endif
+#ifdef AUTO_SHIFT_MODIFIERS
+      | 2
+#endif
+#ifdef NO_AUTO_SHIFT_SPECIAL
+      | 4
+#endif
+#ifdef NO_AUTO_SHIFT_NUMERIC
+      | 8
+#endif
+#ifdef NO_AUTO_SHIFT_ALPHA
+      | 16
+#endif
+#ifdef AUTO_SHIFT_REPEAT
+      | 32
+#endif
+#ifdef AUTO_SHIFT_NO_AUTO_REPEAT
+      | 64
+#endif
+    );
+
     QS.auto_shift_timeout = AUTO_SHIFT_TIMEOUT;
     QS.osk_tap_toggle = ONESHOT_TAP_TOGGLE;
     QS.osk_timeout = ONESHOT_TIMEOUT;

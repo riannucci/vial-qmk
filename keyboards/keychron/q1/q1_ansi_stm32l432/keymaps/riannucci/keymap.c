@@ -29,22 +29,6 @@ enum custom_keycodes {
     KC_LAUNCHPAD,
     KC_TASK_VIEW,
     KC_FILE_EXPLORER,
-
-    // NOTE: Flip codes here are defined as an offset from KC_1 to FC_1.
-    // Semicolon has to be set explicitly here to avoid making a ton of extra
-    // symbols.
-    FC_1,
-    FC_2,
-    FC_3,
-    FC_4,
-    FC_5,
-    FC_6,
-    FC_7,
-    FC_8,
-    FC_9,
-    FC_0,
-
-    FC_SCLN = FC_1+21
 };
 
 typedef struct PACKED {
@@ -64,9 +48,9 @@ key_combination_t key_comb_list[2] = {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_BASE] = LAYOUT_ansi_82(
-        MO(MAC_FN), KC_BRID,    KC_BRIU,  KC_MCTL,  KC_LPAD,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,    KC_VOLU,  KC_DEL,   KC_MUTE,
-        KC_GRV,     FC_1,       FC_2,     FC_3,     FC_4,     FC_5,     FC_6,     KC_MINS,  KC_EQL,   FC_7,     FC_8,     FC_9,       FC_0,     KC_BSPC,            KC_PGUP,
-        KC_TAB,     KC_Q,       KC_W,     KC_F,     KC_P,     KC_B,     KC_QUOT,  KC_J,     KC_L,     KC_U,     KC_Y,     KC_LBRC,    KC_RBRC,  FC_SCLN,            KC_PGDN,
+        MO(MAC_FN),             KC_BRID,  KC_BRIU,  KC_MCTL,  KC_LPAD,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,    KC_VOLU,  KC_DEL,   KC_MUTE,
+        KC_GRV,     KC_1,       KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_MINS,  KC_EQL,   KC_7,     KC_8,     KC_9,       KC_0,     KC_BSPC,            KC_PGUP,
+        KC_TAB,     KC_Q,       KC_W,     KC_F,     KC_P,     KC_B,     KC_QUOT,  KC_J,     KC_L,     KC_U,     KC_Y,     KC_LBRC,    KC_RBRC,  KC_SCLN,            KC_PGDN,
         KC_ESC,     KC_A,       KC_R,     KC_S,     KC_T,     KC_G,     KC_BSLS,  KC_M,     KC_N,     KC_E,     KC_I,     KC_O,                 KC_ENT,             KC_HOME,
         KC_LSPO,                KC_X,     KC_C,     KC_D,     KC_V,     KC_Z,     KC_SLSH,  KC_K,     KC_H,     KC_COMM,  KC_DOT,     KC_RSPC,  KC_UP,
         KC_LCPO,    KC_LAPO,    KC_LGUI,                                KC_SPC,                                 KC_RGUI,  KC_RAPC,    KC_RCPC,  KC_LEFT,  KC_DOWN,  KC_RGHT),
@@ -80,8 +64,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS,  KC_TRNS,  KC_TRNS,                                KC_TRNS,                                KC_TRNS,  KC_TRNS,    KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS),
 
     [WIN_BASE] = LAYOUT_ansi_82(
-        MO(WIN_FN), KC_F1,    KC_F2,    KC_F3,    KC_F4,    KC_F5,    KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   KC_F11,     KC_F12,   KC_DEL,   KC_MUTE,
-        KC_GRV,     FC_1,     FC_2,     FC_3,     FC_4,     FC_5,     FC_6,     KC_MINS,  KC_EQL,   FC_7,     FC_8,     FC_9,       FC_0,     KC_BSPC,            KC_PGUP,
+        MO(WIN_FN),           KC_F1,    KC_F2,    KC_F3,    KC_F4,    KC_F5,    KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,     KC_F11,   KC_F12,   KC_DEL,   KC_MUTE,
+        KC_GRV,     KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_MINS,  KC_EQL,   KC_7,     KC_8,     KC_9,       KC_0,     KC_BSPC,            KC_PGUP,
         KC_TAB,     KC_Q,     KC_W,     KC_F,     KC_P,     KC_B,     KC_QUOT,  KC_J,     KC_L,     KC_U,     KC_Y,     KC_LBRC,    KC_RBRC,  KC_SCLN,            KC_PGDN,
         KC_ESC,     KC_A,     KC_R,     KC_S,     KC_T,     KC_G,     KC_BSLS,  KC_M,     KC_N,     KC_E,     KC_I,     KC_O,                 KC_ENT,             KC_HOME,
         KC_LSPO,              KC_X,     KC_C,     KC_D,     KC_V,     KC_Z,     KC_SLSH,  KC_K,     KC_H,     KC_COMM,  KC_DOT,     KC_RSPC,  KC_UP,
@@ -111,7 +95,6 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 }
 
 uint8_t mod_state;
-uint16_t real_code;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     mod_state = get_mods();
 
@@ -142,25 +125,56 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;  // Skip all further processing of this key
-        case FC_1 ... FC_SCLN:
-            real_code = KC_1 + (keycode - FC_1);
+        case KC_1 ... KC_0:
+        case KC_SCLN:
             if (record->event.pressed) {
               if (mod_state & MOD_MASK_SHIFT) {
+                // We're explicitly shifting; send the unshifted code.
+                // autoshift will handle the non-shifted and auto-shifted
+                // variants.
                 del_mods(MOD_MASK_SHIFT);
-                register_code(real_code);
+                register_code(keycode);
                 set_mods(mod_state);
-              } else if (is_caps_word_on()) {
-                // behave like shifted, e.g. send normal code.
-                register_code(real_code);
-              } else {
-                add_oneshot_mods(MOD_LSFT);
-                register_code(real_code);
+                return false;
+              } else if (mod_state) {
+                // We're in the middle of some command chord: autoshift doesn't
+                // apply.
+                // NOTE: It probably makes sense to vary the behavior here based
+                // on AUTO_SHIFT_MODIFIERS
+                register_code16(S(keycode));
+                return false;
               }
-            } else {
-              unregister_code(real_code);
             }
-            return false;
         default:
             return true;   // Process all other keycodes normally
+    }
+}
+
+void autoshift_press_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_1 ... KC_0:
+        case KC_SCLN:
+            register_code16(shifted ? keycode : S(keycode));
+            break;
+        default:
+            if (shifted) {
+                add_weak_mods(MOD_BIT(KC_LSFT));
+            }
+            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
+            register_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
+    }
+}
+
+void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_1 ... KC_0:
+        case KC_SCLN:
+            unregister_code16(shifted ? keycode : S(keycode));
+            break;
+        default:
+            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
+            // The IS_RETRO check isn't really necessary here, always using
+            // keycode & 0xFF would be fine.
+            unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
     }
 }

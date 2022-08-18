@@ -21,6 +21,8 @@
 #    include "process_auto_shift.h"
 #    include "qmk_settings.h"
 
+#    include "caps_word.h"
+
 #    ifndef AUTO_SHIFT_DISABLED_AT_STARTUP
 #        define AUTO_SHIFT_STARTUP_STATE true /* enabled */
 #    else
@@ -353,6 +355,7 @@ void set_autoshift_timeout(uint16_t timeout) {
 
 bool process_auto_shift(uint16_t keycode, keyrecord_t *record) {
     if (!QS_auto_shift_enable) return true;
+    if (is_caps_word_on()) return true;
     // Note that record->event.time isn't reliable, see:
     // https://github.com/qmk/qmk_firmware/pull/9826#issuecomment-733559550
     // clang-format off
